@@ -1,6 +1,6 @@
 {
   "name": "@mhlabs/schemas-cli",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "CLI to manage schemas in EventBridge Schema Registry",
   "main": "index.js",
   "scripts": {
@@ -18,9 +18,9 @@
     "quicktype-core": "^6.0.69"
   },
   "bugs": {
-    "url": "https://github.com/mhlabs/evb-cli/issues"
+    "url": "https://github.com/mhlabs/schemas-cli/issues"
   },
-  "homepage": "https://github.com/mhlabs/evb-cli#readme",
+  "homepage": "https://github.com/mhlabs/schemas-cli#readme",
   "devDependencies": {
     "jest": "^25.5.4"
   },
