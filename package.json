@@ -1,0 +1,36 @@
+{
+  "name": "@mhlabs/schemas-cli",
+  "version": "0.0.1",
+  "description": "CLI to manage schemas in EventBridge Schema Registry",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mhlabs",
+  "license": "ISC",
+  "dependencies": {
+    "@mhlabs/aws-sdk-sso": "0.0.12",
+    "@openapi-contrib/openapi-schema-to-json-schema": "^3.0.4",
+    "aws-sdk": "^2.827.0",
+    "axios": "^0.21.1",
+    "commander": "^6.2.1",
+    "inquirer": "^7.3.3",
+    "quicktype-core": "^6.0.69"
+  },
+  "bugs": {
+    "url": "https://github.com/mhlabs/evb-cli/issues"
+  },
+  "homepage": "https://github.com/mhlabs/evb-cli#readme",
+  "devDependencies": {
+    "jest": "^25.1.0"
+  },
+  "bin": {
+    "schemas": "index.js"
+  },
+  "keywords": [
+    "aws",
+    "serverless",
+    "eventbridge",
+    "productivity"
+  ]
+}
