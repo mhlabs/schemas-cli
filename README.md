@@ -7,6 +7,8 @@ This is still in beta.
 ## Commands
 
 ### `$ schemas import`
+
+```
 Usage: index import|i [options]
 
 Imports OpenAPI3 speficications from file or URL into Amazon EventBridge Schema Registry
@@ -22,8 +24,11 @@ Options:
                                  AWS_REGION environment variable if not
                                  specified
   -h, --help                     display help for command
+```
 
 ### `$ schemas code-bindings`
+
+```
 Usage: index code-bindings|cb [options]
 
 Starts a schmea registry browser and outputs code bindings
@@ -37,3 +42,5 @@ Options:
                                    AWS_REGION environment variable if not
                                    specified
   -h, --help                       display help for command
+  
+```
