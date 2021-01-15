@@ -1,6 +1,6 @@
 {
   "name": "@mhlabs/schemas-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "CLI to manage schemas in EventBridge Schema Registry",
   "main": "index.js",
   "scripts": {
@@ -27,10 +27,15 @@
   "bin": {
     "schemas": "index.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "aws",
     "serverless",
     "eventbridge",
+    "schemas",
+    "openapi",
     "productivity"
   ]
 }

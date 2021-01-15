@@ -50,7 +50,6 @@ async function create(cmd) {
     const path = await getPath(schema);
     const method = await getMethod(schema, path);
     const direction = await getDirection(schema, path, method);
-    console.log(direction);
     if (direction === "responses") {
       const status = await getStatusCode(schema, path, method);
       const responses = schema.paths[path][method].responses[status];
@@ -69,7 +68,6 @@ async function create(cmd) {
           : content.schema.$ref;
       outputSchemaName = ref.split("/").slice(-1)[0];
     } else {
-      console.log(JSON.stringify(schema.paths[path][method], null, 2));
       const ref =
         schema.paths[path][method].requestBody.content[applicationJson].schema
           .$ref;
@@ -203,7 +201,6 @@ async function generateType(typeName, schema, cmd) {
       );
     }
   }
-  console.log(JSON.stringify(jsonSchema, null, 2));
   const schemaInput = new JSONSchemaInput(new JSONSchemaStore());
   await schemaInput.addSource({
     name: typeName,
