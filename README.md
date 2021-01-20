@@ -4,6 +4,9 @@ CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema
 
 This is still in beta.
 
+## Installation
+`npm install -g @mhlabs/schemas-cli`
+
 ## Commands
 
 ### `$ schemas import`
