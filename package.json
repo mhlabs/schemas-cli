@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/mhlabs/schemas-cli#readme",
   "devDependencies": {
-    "jest": "^25.5.4"
+    "jest": "^25.5.4",
+    "node-notifier": ">=8.0.1",
+    "node-fetch": ">=2.6.1"
   },
   "bin": {
     "schemas": "index.js"
