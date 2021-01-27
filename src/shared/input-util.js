@@ -20,6 +20,7 @@ async function getRegistry(schemas, skipManaged = false) {
         p.RegistryName !== "discovered-schemas"
     );
   }
+  registries.Registries.push({RegistryName: "API Gateway"});
   if (!Object.keys(registries.Registries).length) {
     return null;
   }

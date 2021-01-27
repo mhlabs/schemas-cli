@@ -2,8 +2,6 @@
 
 CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema registry. These schemas can then be used to generate code bindings in a [variety of languages](https://github.com/quicktype/quicktype#target-languages)
 
-This is still in beta.
-
 ## Commands
 
 ### `$ schemas import`
