@@ -2,9 +2,14 @@
 
 CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema registry. These schemas can then be used to generate code bindings in a [variety of languages](https://github.com/quicktype/quicktype#target-languages)
 
+## Installation
+`npm install -g @mhlabs/schemas-cli`
+
 ## Commands
 
 ### `$ schemas import`
+
+```
 Usage: index import|i [options]
 
 Imports OpenAPI3 speficications from file or URL into Amazon EventBridge Schema Registry
@@ -20,8 +25,11 @@ Options:
                                  AWS_REGION environment variable if not
                                  specified
   -h, --help                     display help for command
+```
 
 ### `$ schemas code-bindings`
+
+```
 Usage: index code-bindings|cb [options]
 
 Starts a schmea registry browser and outputs code bindings
@@ -35,3 +43,5 @@ Options:
                                    AWS_REGION environment variable if not
                                    specified
   -h, --help                       display help for command
+  
+```
