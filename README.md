@@ -5,6 +5,14 @@ CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema
 ## Installation
 `npm install -g @mhlabs/schemas-cli`
 
+## Features
+* Imports OpenAPI 3 schemas from URL or file to EventBridge Schema Registry
+* Lets you browse all schema registries and generate code bindings in a large range of languages
+* Lets you browse your API Gateways and generate code bindings from any OpenAPI 3 schema you may have associated with your APIs
+
+## Demo
+![!Demo](images/demo.gif)
+
 ## Commands
 
 ### `$ schemas import`

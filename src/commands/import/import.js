@@ -57,6 +57,8 @@ async function run(cmd) {
         Type: "OpenApi3",
       })
       .promise();
+      console.log("Schema updated");
+
   } catch (err) {
     if (err.message == `Schema with name ${schemaName} does not exist.`) {
       await schemas
@@ -68,6 +70,7 @@ async function run(cmd) {
           Type: "OpenApi3",
         })
         .promise();
+        console.log("Schema created");
     } else {
       console.log(err);
     }
