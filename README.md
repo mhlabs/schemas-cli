@@ -1,6 +1,6 @@
 # schemas-cli
 
-CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema registry. These schemas can then be used to generate code bindings in a [variety of languages](https://github.com/quicktype/quicktype#target-languages)
+CLI tool that lets you import OpenAPI definitions into Amazon EventBridge Schema registry. These schemas can then be used to generate code bindings in a [variety of languages](https://github.com/quicktype/quicktype#target-languages)
 
 ## Installation
 `npm install -g @mhlabs/schemas-cli`
@@ -11,7 +11,7 @@ CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema
 * Lets you browse your API Gateways and generate code bindings from any OpenAPI 3 schema you may have associated with your APIs
 
 ## Demo
-![!Demo](images/demo.gif)
+![!Demo](https://raw.githubusercontent.com/mhlabs/schemas-cli/master/images/demo.gif)
 
 ## Commands
 
