@@ -9,6 +9,7 @@ CLI tool that lets you import OpenAPI definitions into Amazon EventBridge Schema
 * Imports OpenAPI 3 schemas from URL or file to EventBridge Schema Registry
 * Lets you browse all schema registries and generate code bindings in a large range of languages
 * Lets you browse your API Gateways and generate code bindings from any OpenAPI 3 schema you may have associated with your APIs
+* Fetch schema from URL or your local file system
 * Supports both YAML and JSON
 
 ## Demo
