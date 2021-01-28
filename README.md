@@ -9,9 +9,14 @@ CLI took that lets you import OpenAPI definitions into Amazon EventBridge Schema
 * Imports OpenAPI 3 schemas from URL or file to EventBridge Schema Registry
 * Lets you browse all schema registries and generate code bindings in a large range of languages
 * Lets you browse your API Gateways and generate code bindings from any OpenAPI 3 schema you may have associated with your APIs
+* Supports both YAML and JSON
 
 ## Demo
+Browsing Amazon EventBridge Schema Registry:
 ![!Demo](images/demo.gif)
+
+Browsing files on your local computer:
+![!Demo](images/demo-local-file.gif)
 
 ## Commands
 
@@ -38,18 +43,17 @@ Options:
 ### `$ schemas code-bindings`
 
 ```
-Usage: index code-bindings|cb [options]
+Usage: schemas code-bindings|cb [options]
 
-Starts a schmea registry browser and outputs code bindings
+Starts a schema registry browser and outputs code bindings
 
 Options:
+  -f, --file [filePath]            File path to OpenAPI definition (optional)
+  -u, --url [url]                  URL to OpenAPI definition (optional)
   -l, --language [language]        Output language (optional)
-  -o, --output-file [output-file]  Output file (optional. Writes to std-out
-                                   if omitted)
+  -o, --output-file [output-file]  Output file (optional. Writes to std-out if omitted)
   -p, --profile [profile]          AWS profile to use (default: "default")
-  --region [region]                The AWS region to use. Falls back on
-                                   AWS_REGION environment variable if not
-                                   specified
+  --region [region]                The AWS region to use. Falls back on AWS_REGION environment variable if not specified
   -h, --help                       display help for command
   
 ```

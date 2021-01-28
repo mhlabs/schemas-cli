@@ -1,13 +1,12 @@
-const AWS = require("aws-sdk");
-const schemas = new AWS.Schemas();
-const apiGateway = new AWS.APIGateway();
 const inputUtil = require("../../shared/input-util");
+const axios = require("axios").default;
+const authHelper = require("../../shared/auth-helper");
+const parser = require("../../shared/parser");
 const fs = require("fs");
 const toJsonSchema = require("@openapi-contrib/openapi-schema-to-json-schema");
 const {
   quicktype,
   InputData,
-  jsonInputForTargetLanguage,
   JSONSchemaInput,
   JSONSchemaStore,
 } = require("quicktype-core");
@@ -19,41 +18,85 @@ require("./languages/typescript");
 require("./languages/python");
 require("./languages/java");
 require("./languages/swift");
+let schemas, apiGateway;
 
 const applicationJson = "application/json";
 async function create(cmd) {
   let schema;
-  const registry = await inputUtil.getRegistry(schemas);
-  if (registry === "API Gateway") {
-    const apis = [];
-    let apiResponse = await apiGateway.getRestApis().promise();
-    apis.push(...apiResponse.items.map((p) => {
-      return { name: p.name, value: p };
-    }));
-    while(apiResponse.$response.hasNextPage()) {
-      apiResponse = await apiResponse.$response.nextPage().promise();
-      apis.push(...apiResponse.items.map((p) => {
-        return { name: p.name, value: p };
-      }));        
-      
-    } 
-    const restApi = await inputUtil.selectOne(apis, "Select Rest API");
-    const stages = (
-      await apiGateway.getStages({ restApiId: restApi.id }).promise()
-    ).item.map((p) => p.stageName);
-    const stage = await inputUtil.selectOne(stages, "Select stage");
-    const schemaResponse = await apiGateway
-      .getExport({
-        restApiId: restApi.id,
-        exportType: "oas30",
-        stageName: stage,
-      })
-      .promise();
-    schema = JSON.parse(schemaResponse.body.toString());
-  } else {
-    const schemaName = await getSchemaName(registry);
-    schema = schema || (await getSchema(registry, schemaName));
+
+  if (cmd.url) {
+    schema = await getFromUrl(cmd);
   }
+  if (cmd.file) {
+    schema = getFromFile(cmd);
+  } else {
+    const AWS = require("aws-sdk");
+    schemas = new AWS.Schemas();
+    apiGateway = new AWS.APIGateway();
+
+    const registry = await inputUtil.getSchemaStorage(
+      schemas,
+      authHelper.authenticated
+    );
+    if (registry === "REST APIs") {
+      schema = await getFromApiGateway(schema);
+    } else if (registry === "URL") {
+      const url = await inputUtil.input("Enter URL:");
+      schema = await getFromUrl({ url: url });
+    } else if (registry === "Local file") {
+      const file = await inputUtil.file();
+      schema = getFromFile({ file: file });
+    } else {
+      const schemaName = await getSchemaName(registry);
+      schema = schema || (await getSchema(registry, schemaName));
+    }
+  }
+  handleSchema(schema, cmd);
+}
+
+async function getFromApiGateway(schema) {
+  const apis = [];
+  let apiResponse = await apiGateway.getRestApis().promise();
+  apis.push(
+    ...apiResponse.items.map((p) => {
+      return { name: p.name, value: p };
+    })
+  );
+  while (apiResponse.$response.hasNextPage()) {
+    apiResponse = await apiResponse.$response.nextPage().promise();
+    apis.push(
+      ...apiResponse.items.map((p) => {
+        return { name: p.name, value: p };
+      })
+    );
+  }
+  const restApi = await inputUtil.selectOne(apis, "Select Rest API");
+  const stages = (
+    await apiGateway.getStages({ restApiId: restApi.id }).promise()
+  ).item.map((p) => p.stageName);
+  const stage = await inputUtil.selectOne(stages, "Select stage");
+  const schemaResponse = await apiGateway
+    .getExport({
+      restApiId: restApi.id,
+      exportType: "oas30",
+      stageName: stage,
+    })
+    .promise();
+  schema = parser.parse(schemaResponse.body.toString());
+  return schema;
+}
+
+function getFromFile(cmd) {
+  const schema = fs.readFileSync(cmd.file);
+  return parser.parse(schema.toString());
+}
+
+async function getFromUrl(cmd) {
+  const schema = await axios.get(cmd.url);
+  return await schema.data;
+}
+
+async function handleSchema(schema, cmd) {
   const paths = Object.keys(schema.paths);
   let outputSchemaName;
   if (paths.length) {
@@ -73,14 +116,12 @@ async function create(cmd) {
       const content =
         schema.paths[path][method].responses[status].content[applicationJson];
       if (!content.schema) {
-        console.log(
-          `Cannot handle ${JSON.stringify(content, null, 2)}`
-        );
+        console.log(`Cannot handle ${JSON.stringify(content, null, 2)}`);
         return;
       }
 
       const ref =
-      content.schema.type === "array"
+        content.schema.type === "array"
           ? content.schema.items.$ref
           : content.schema.$ref;
       outputSchemaName = ref != null ? ref.split("/").slice(-1)[0] : null;
@@ -138,7 +179,10 @@ async function getMethod(schema, path) {
 async function getPath(schema) {
   const paths = [];
   for (const path of Object.keys(schema.paths)) {
-    paths.push({name: `[${Object.keys(schema.paths[path]).join(",")}] ${path}`, value: path})
+    paths.push({
+      name: `[${Object.keys(schema.paths[path]).join(",")}] ${path}`,
+      value: path,
+    });
   }
   return await inputUtil.selectOne(paths, "Select path");
 }
@@ -157,7 +201,7 @@ async function getSchema(registry, schemaName) {
   const schema = await schemas
     .describeSchema({ RegistryName: registry, SchemaName: schemaName })
     .promise();
-  return JSON.parse(schema.Content);
+  return parser.parse(schema.Content);
 }
 
 function traverseSchemaReferences(schema, current, list) {
@@ -340,6 +384,7 @@ async function generateTypeOld(typeName, schema, cmd) {
 
   if (cmd.outputFile) {
     fs.writeFileSync(cmd.outputFile, output);
+    console.log(`File created: ${cmd.outputFile}`);
   } else {
     console.log(output);
   }

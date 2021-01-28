@@ -1,6 +1,6 @@
 {
   "name": "@mhlabs/schemas-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI to manage schemas in EventBridge Schema Registry",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,9 @@
     "axios": "^0.21.1",
     "commander": "^6.2.1",
     "inquirer": "^7.3.3",
-    "quicktype-core": "^6.0.69"
+    "inquirer-file-tree-selection-prompt": "^1.0.7",
+    "quicktype-core": "^6.0.69",
+    "yaml": "^1.10.0"
   },
   "bugs": {
     "url": "https://github.com/mhlabs/schemas-cli/issues"

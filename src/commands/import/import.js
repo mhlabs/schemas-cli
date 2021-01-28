@@ -1,6 +1,7 @@
 const AWS = require("aws-sdk");
 const schemas = new AWS.Schemas();
 const apiGateway = new AWS.APIGateway();
+const parser = require("../../shared/parser");
 const inputUtil = require("../../shared/input-util");
 const fs = require("fs");
 const axios = require("axios").default;
@@ -38,7 +39,7 @@ async function run(cmd) {
 
     fileContent = schemaRespone.body.toString();
   }
-  const schema = JSON.parse(fileContent.toString());
+  const schema = parser.parse(fileContent.toString());
   const registry = cmd.registry || (await inputUtil.getRegistry(schemas, true));
 
   if (!registry) {
