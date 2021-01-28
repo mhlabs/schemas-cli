@@ -16,7 +16,7 @@ CLI tool that lets you import OpenAPI definitions into Amazon EventBridge Schema
 ![!Demo](https://raw.githubusercontent.com/mhlabs/schemas-cli/master/images/demo.gif)
 
 Browsing files on your local computer:
-![!Demo](https://raw.githubusercontent.com/mhlabs/schemas-cli/demo-local-file.gif)
+![!Demo](https://raw.githubusercontent.com/mhlabs/schemas-cli/images/demo-local-file.gif)
 
 ## Commands
 
