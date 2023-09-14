@@ -1,10 +1,8 @@
-const {
-    BooleanOption,
-  } = require("quicktype-core/dist/RendererOptions");
+import { BooleanOption } from "quicktype-core/dist/RendererOptions.js";
   
-const options = require("quicktype-core/dist/language/Swift");
+import { swiftOptions } from "quicktype-core/dist/language/Swift.js";
 
-options.swiftOptions.justTypes = new BooleanOption(
+swiftOptions.justTypes = new BooleanOption(
   "JustTypes",
   null,
   true

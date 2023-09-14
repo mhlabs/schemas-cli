@@ -1,10 +1,8 @@
-const {
-    BooleanOption,
-  } = require("quicktype-core/dist/RendererOptions");
+import { BooleanOption } from "quicktype-core/dist/RendererOptions.js";
   
-const pythonOptions = require("quicktype-core/dist/language/Python");
+import { pythonOptions as _pythonOptions } from "quicktype-core/dist/language/Python.js";
 
-pythonOptions.pythonOptions.justTypes = new BooleanOption(
+_pythonOptions.justTypes = new BooleanOption(
     "JustTypes",
     null,
     true

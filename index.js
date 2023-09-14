@@ -1,15 +1,22 @@
 #!/usr/bin/env node
 process.env.AWS_SDK_LOAD_CONFIG = 1;
-const AWS = require("aws-sdk");
+
 process.env.AWS_SDK_LOAD_CONFIG = 1;
-const program = require("commander");
-const package = require("./package.json");
-require("./src/commands/code-bindings");
-require("./src/commands/import");
+import commander from "commander";
+import fs from "fs";
+import path from "path";
+import url from "url";
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-program.version(package.version, "-v, --vers", "output the current version");
+const _version = JSON.parse(fs.readFileSync(path.join(__dirname, "./package.json"), "utf-8")).version;
 
-program.parse(process.argv);
+(await import("./src/commands/code-bindings/index.js")).createCommand(commander);
+(await import("./src/commands/import/index.js")).createCommand(commander);
+(await import("./src/commands/create/index.js")).createCommand(commander);
+
+commander.version(_version, "-v, --vers", "output the current version");
+
+commander.parse(process.argv);
 if (process.argv.length < 3) {
-  program.help();
+  commander.help();
 }

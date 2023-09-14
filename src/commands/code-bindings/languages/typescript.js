@@ -1,10 +1,8 @@
-const {
-    BooleanOption,
-  } = require("quicktype-core/dist/RendererOptions");
+import { BooleanOption } from "quicktype-core/dist/RendererOptions.js";
   
-const typeScriptOptions = require("quicktype-core/dist/language/TypeScriptFlow");
+import { tsFlowOptions } from "quicktype-core/dist/language/TypeScriptFlow.js";
 
-typeScriptOptions.tsFlowOptions.justTypes = new BooleanOption(
+tsFlowOptions.justTypes = new BooleanOption(
     "JustTypes",
     null,
     true

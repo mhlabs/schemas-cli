@@ -1,11 +1,11 @@
-const { test } = require("quicktype-core/dist/MarkovChain");
-const testSchema = require("../../../test-data/petstore.json");
-const codeBindings = require("./code-bindings");
-const toJsonSchema = require("@openapi-contrib/openapi-schema-to-json-schema");
+import { test } from "quicktype-core/dist/MarkovChain";
+import testSchema from "../../../test-data/petstore.json";
+import { traverseSchemaReferences } from "./code-bindings";
+import toJsonSchema from "@openapi-contrib/openapi-schema-to-json-schema";
 
 describe("Traverse when root is array of objects", () => {
   const outputList = [];
-  const allRelevantItems = codeBindings.traverseSchemaReferences(
+  const allRelevantItems = traverseSchemaReferences(
     testSchema,
     "Pets",
     outputList

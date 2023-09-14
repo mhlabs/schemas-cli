@@ -1,15 +1,13 @@
-const {
-    BooleanOption,
-  } = require("quicktype-core/dist/RendererOptions");
+import { BooleanOption } from "quicktype-core/dist/RendererOptions.js";
   
-const options = require("quicktype-core/dist/language/Java");
+import { javaOptions } from "quicktype-core/dist/language/Java.js";
 
-options.javaOptions.justTypes = new BooleanOption(
+javaOptions.justTypes = new BooleanOption(
   "JustTypes",
   null,
   true
 );
-options.javaOptions.useList = new BooleanOption(
+javaOptions.useList = new BooleanOption(
   "UseList",
   null,
   true

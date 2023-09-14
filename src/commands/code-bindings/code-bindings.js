@@ -1,27 +1,30 @@
-const inputUtil = require("../../shared/input-util");
-const axios = require("axios").default;
-const authHelper = require("../../shared/auth-helper");
-const parser = require("../../shared/parser");
-const fs = require("fs");
-const toJsonSchema = require("@openapi-contrib/openapi-schema-to-json-schema");
-const {
+import inputUtil from "../../shared/input-util.js";
+import axios from "axios";
+import parser from "../../shared/parser.js";
+import fs from "fs";
+import toJsonSchema from "@openapi-contrib/openapi-schema-to-json-schema";
+import { SchemasClient, ListSchemasCommand, DescribeSchemaCommand } from "@aws-sdk/client-schemas";
+import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
+import { fromSSO } from "@aws-sdk/credential-provider-sso";
+import {
   quicktype,
   InputData,
   JSONSchemaInput,
   JSONSchemaStore,
-} = require("quicktype-core");
-const typeScriptOptions = require("quicktype-core/dist/language/TypeScriptFlow");
-const languages = require("quicktype-core/dist/language/All");
+} from "quicktype-core";
+import languages from "quicktype-core/dist/language/All.js";
 
-require("./languages/csharp");
-require("./languages/typescript");
-require("./languages/python");
-require("./languages/java");
-require("./languages/swift");
+import "./languages/csharp.js";
+import "./languages/typescript.js";
+import "./languages/python.js";
+import "./languages/java.js";
+import "./languages/swift.js";
+
 let schemas, apiGateway;
 
 const applicationJson = "application/json";
-async function create(cmd) {
+
+export async function create(cmd) {
   let schema;
 
   if (cmd.url) {
@@ -30,13 +33,13 @@ async function create(cmd) {
   if (cmd.file) {
     schema = getFromFile(cmd);
   } else {
-    const AWS = require("aws-sdk");
-    schemas = new AWS.Schemas();
-    apiGateway = new AWS.APIGateway();
+    const credentials = await fromSSO({ profile: cmd.profile });
+
+    schemas = new SchemasClient({ credentials, region: cmd.region });
+    apiGateway = new APIGatewayClient({ credentials, region: cmd.region });
 
     const registry = await inputUtil.getSchemaStorage(
-      schemas,
-      authHelper.authenticated
+      schemas
     );
     if (registry === "REST APIs") {
       schema = await getFromApiGateway(schema);
@@ -97,6 +100,13 @@ async function getFromUrl(cmd) {
 }
 
 async function handleSchema(schema, cmd) {
+  if (schema.paths ) {
+    return await handleOpenApi(schema, cmd);
+  } else {
+    return await writeSchema("Test", schema, cmd);
+  }
+}
+async function handleOpenApi(schema, cmd) {
   const paths = Object.keys(schema.paths);
   let outputSchemaName;
   if (paths.length) {
@@ -188,9 +198,8 @@ async function getPath(schema) {
 }
 
 async function getSchemaName(registry) {
-  const schemaResponse = await schemas
-    .listSchemas({ RegistryName: registry })
-    .promise();
+  const schemaResponse = await schemas.send(new ListSchemasCommand({ RegistryName: registry }));
+  console.log(schemaResponse);
   return await inputUtil.selectOne(
     schemaResponse.Schemas.map((p) => p.SchemaName),
     "Select schema"
@@ -198,13 +207,11 @@ async function getSchemaName(registry) {
 }
 
 async function getSchema(registry, schemaName) {
-  const schema = await schemas
-    .describeSchema({ RegistryName: registry, SchemaName: schemaName })
-    .promise();
-  return parser.parse(schema.Content);
+  const schemaResponse = await schemas.send(new DescribeSchemaCommand({ RegistryName: registry, SchemaName: schemaName }));
+  return parser.parse(schemaResponse.Content);
 }
 
-function traverseSchemaReferences(schema, current, list) {
+export function traverseSchemaReferences(schema, current, list) {
   if (!list.includes(current)) {
     list.push(current);
     currentNode = schema.components.schemas[current];
@@ -272,7 +279,7 @@ function allNodes(obj, key, array) {
   return array;
 }
 
-async function generateType(typeName, schema, cmd) {
+export async function generateType(typeName, schema, cmd) {
   let jsonSchema = {
     $schema: "http://json-schema.org/draft-04/schema#",
     title: typeName,
@@ -295,6 +302,12 @@ async function generateType(typeName, schema, cmd) {
       "#/definitions/"
     )
   );
+
+
+  await writeSchema(typeName, jsonSchema, cmd);
+}
+
+async function writeSchema(typeName, jsonSchema, cmd) {
   const schemaInput = new JSONSchemaInput(new JSONSchemaStore());
   await schemaInput.addSource({
     name: typeName,
@@ -390,8 +403,3 @@ async function generateTypeOld(typeName, schema, cmd) {
   }
 }
 
-module.exports = {
-  create,
-  traverseSchemaReferences,
-  generateType,
-};
