@@ -20,9 +20,14 @@ export function createCommand(program) {
   program.command('create')
     .alias('c')
     .description('Browses types in your project and lets you create schemas from them')
-    .option('-t, --template <path>', 'Path to SAM template', './template.yaml')
-    .option('-p, --path <path>', 'Root path', './bin/Debug/net6.0')
-    .option('-e, --file-extension <extension>', 'File extension filter', '.ts')
+    .option('-t, --template [path]', 'Path to SAM template', './template.yaml')
+    .option('-e, --file-extension [extension]', 'File extension filter', '.ts')
+    .option("-p, --profile [profile]", "AWS profile to use", "default")
+    .option('--path [path]', 'Root path', './bin/Debug/net6.0')
+    .option(
+      "--region [region]",
+      "The AWS region to use. Falls back on AWS_REGION environment variable if not specified"
+    )
     .action(async (cmd) => {
       //console.log(cmd);
       const template = parse('template', fs.readFileSync(cmd.template, 'utf-8'));
@@ -63,7 +68,7 @@ export function createCommand(program) {
         Type: 'AWS::EventSchemas::Schema',
         Properties: {
           Type: 'JSONSchemaDraft4',
-          RegistryName: Object.values(registry)[0],
+          RegistryName: registry.registry,
           SchemaName: {
             'Fn::Sub': '${AWS::StackName}@' + fileName
           },
@@ -133,17 +138,17 @@ async function dotnet(cmd) {
 
 async function getRegistries(schemas) {
   const sources = [];
-  let NextToken;
+  let nextToken;
   do {
-    const registries = await schemas.send(new ListRegistriesCommand({ NextToken: NextToken }));
-    NextToken = registries.NextToken;
+    const registries = await schemas.send(new ListRegistriesCommand({ NextToken: nextToken }));
+    nextToken = registries.NextToken;
     registries.Registries = registries.Registries.filter(
       (p) =>
         p.RegistryName !== "aws.events" &&
         p.RegistryName !== "discovered-schemas"
     );
     sources.push(...registries.Registries.map((p) => p.RegistryName));
-  } while (NextToken);
+  } while (nextToken);
   return sources;
 }
 
