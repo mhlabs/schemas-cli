@@ -8,12 +8,15 @@ import { parse, stringify } from '../../shared/parserv2.js';
 import TJS from 'typescript-json-schema';
 import ts from 'typescript';
 import process from 'node:process';
+import { SchemasClient, ListRegistriesCommand } from "@aws-sdk/client-schemas";
+import { fromSSO } from "@aws-sdk/credential-provider-sso";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection)
 
 export function createCommand(program) {
+
   program.command('create')
     .alias('c')
     .description('Browses types in your project and lets you create schemas from them')
@@ -43,13 +46,24 @@ export function createCommand(program) {
 
       var fileName = result.file.name.split('.').pop();
 
+      const credentials = fromSSO({ profile: cmd.profile });
+      const schemas = new SchemasClient({ credentials, region: cmd.region });
+
+      const registries = await getRegistries(schemas);
+      const registry = await inquirer.prompt({
+        type: 'list',
+        name: 'registry',
+        message: 'Select registry',
+        choices: registries
+      });
+
       //create ./schemas/schema.json      
       fs.writeFileSync(`./schemas/${fileName}.json`, result.schema);
       template.Resources[fileName + 'Schema'] = {
         Type: 'AWS::EventSchemas::Schema',
         Properties: {
           Type: 'JSONSchemaDraft4',
-          RegistryName: 'DynamoDBEvents',
+          RegistryName: Object.values(registry)[0],
           SchemaName: {
             'Fn::Sub': '${AWS::StackName}@' + fileName
           },
@@ -117,6 +131,21 @@ async function dotnet(cmd) {
   }
 }
 
+async function getRegistries(schemas) {
+  const sources = [];
+  let NextToken;
+  do {
+    const registries = await schemas.send(new ListRegistriesCommand({ NextToken: NextToken }));
+    NextToken = registries.NextToken;
+    registries.Registries = registries.Registries.filter(
+      (p) =>
+        p.RegistryName !== "aws.events" &&
+        p.RegistryName !== "discovered-schemas"
+    );
+    sources.push(...registries.Registries.map((p) => p.RegistryName));
+  } while (NextToken);
+  return sources;
+}
 
 function listTypesInDirectory(directoryPath, types) {
   const fileNames = fs.readdirSync(directoryPath);
