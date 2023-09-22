@@ -1,4 +1,4 @@
-import { SchemasClient } from "@aws-sdk/client-schemas";
+import { CreateSchemaCommand, SchemasClient, UpdateSchemaCommand } from "@aws-sdk/client-schemas";
 import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
 import { fromSSO } from "@aws-sdk/credential-provider-sso";
 
@@ -9,8 +9,8 @@ import axios from "axios";
 export async function run(cmd) {
   const credentials = await fromSSO({ profile: cmd.profile });
   const schemas = new SchemasClient({ credentials, region: cmd.region });
-  const apiGateway = new APIGatewayClient( { credentials, region: cmd.region });
-    let fileContent;
+  const apiGateway = new APIGatewayClient({ credentials, region: cmd.region });
+  let fileContent;
   if (cmd.file) {
     fileContent = readFileSync(cmd.file);
   } else if (cmd.url) {
@@ -53,28 +53,24 @@ export async function run(cmd) {
 
   const schemaName = cmd.schemaName || schema.info.title.replace(/ /g, "_");
   try {
-    await schemas
-      .updateSchema({
+    await schemas.send(new UpdateSchemaCommand({
+      RegistryName: registry,
+      SchemaName: schemaName,
+      Content: fileContent.toString(),
+      Description: schema.info.description,
+      Type: "OpenApi3",
+    }));
+    console.log("Schema updated");
+
+  } catch (err) {
+    if (err.message == `Schema with name ${schemaName} does not exist.`) {
+      await schemas.send(new CreateSchemaCommand({
         RegistryName: registry,
         SchemaName: schemaName,
         Content: fileContent.toString(),
         Description: schema.info.description,
         Type: "OpenApi3",
-      })
-      .promise();
-    console.log("Schema updated");
-
-  } catch (err) {
-    if (err.message == `Schema with name ${schemaName} does not exist.`) {
-      await schemas
-        .createSchema({
-          RegistryName: registry,
-          SchemaName: schemaName,
-          Content: fileContent.toString(),
-          Description: schema.info.description,
-          Type: "OpenApi3",
-        })
-        .promise();
+      }));
       console.log("Schema created");
     } else {
       console.log(err);
