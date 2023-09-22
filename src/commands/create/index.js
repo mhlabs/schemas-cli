@@ -84,7 +84,7 @@ async function nodejs(cmd) {
   const file = await inquirer.prompt({
     type: 'list',
     name: 'type',
-    message: 'Select',
+    message: 'Select type',
     choices: types
   });
 

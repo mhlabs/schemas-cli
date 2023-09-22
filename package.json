@@ -1,6 +1,6 @@
 {
   "name": "@mhlabs/schemas-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI to manage schemas in EventBridge Schema Registry",
   "main": "index.js",
   "type": "module",
