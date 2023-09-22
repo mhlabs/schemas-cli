@@ -10,10 +10,11 @@
   "author": "mhlabs",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-api-gateway": "^3.414.0",
+    "@aws-sdk/client-schemas": "^3.414.0",
     "@aws-sdk/credential-provider-sso": "^3.410.0",
     "@mhlabs/aws-sdk-sso": "0.0.12",
     "@openapi-contrib/openapi-schema-to-json-schema": "^3.0.4",
-    "aws-sdk": "^2.827.0",
     "axios": "^0.21.1",
     "commander": "^6.2.1",
     "inquirer": "^7.3.3",
