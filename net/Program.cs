@@ -15,18 +15,15 @@ class Program
     var name = argv[2];
     var cwd = argv[3];    
     var typeName = argv[4];    
-    Program.assemblyName = typeName + ".dll";
-    //binFolderPath =  @"/home/lars/code/mathem/address-service/address_service/bin/Debug/net6.0";
-    Program.binFolderPath =  Path.Combine(cwd, "bin", "Debug", "net6.0");
-    if (!Directory.Exists(Program.binFolderPath))
+    Program.assemblyName = typeName;
+    if (!Directory.Exists(binFolderPath))
     {
-      Program.binFolderPath = Path.Combine(cwd, typeName, "bin", "Debug", "net6.0");
+      binFolderPath = Path.Combine(cwd, typeName, "bin", "Debug", "net6.0");
     }
 
-    if (!Directory.Exists(Program.binFolderPath))
+    if (!Directory.Exists(binFolderPath))
     {
       throw new Exception("Could not find bin folder. Please run 'dotnet build' from the project root.");
-      return;
     }
 
     if (command == "list")
@@ -89,7 +86,7 @@ public static class AssemblyResolver
   private static Assembly? ResolveDependency(object sender, ResolveEventArgs args)
   {
     var name = args.Name.Split(",")[0];
-    string path = Path.Combine(Program.binFolderPath, name + ".dll");
+    string path = Path.Combine(Program.binFolderPath, name);
     if (loadedAssemblies.Contains(args.Name)) return null;
     loadedAssemblies.Add(args.Name);
     if (File.Exists(path))

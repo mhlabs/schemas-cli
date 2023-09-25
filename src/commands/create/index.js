@@ -99,9 +99,11 @@ async function nodejs(cmd) {
 async function dotnet(cmd) {
   try {
     const netPath = path.resolve(__dirname, "..", "..", "..", 'net');
-    const cwd = process.cwd();
-    const projectName = path.basename(cwd).replace(/-/g, '_');
-    const proc = execSync(`dotnet run ${path.resolve(cmd.path)} list ${projectName} ${process.cwd()} ${projectName}`, { cwd: netPath });
+    const binFolderPath = cmd.path ? path.resolve(cmd.path) : process.cwd();
+    const binFolderFiles = fs.readdirSync(binFolderPath);
+    // Get the project name from the dll in the bin folder
+    const projectName = binFolderFiles.filter(file => path.extname(file).toLowerCase() === '.dll')[0];
+    const proc = execSync(`dotnet run ${path.resolve(cmd.path)} list ${projectName} ${binFolderPath} ${projectName}`, { cwd: netPath });
     const types = proc.toString().split('\n').sort().filter(p => p && p.length && !p.includes(" warning "));
     const file = await inquirer.prompt({
       type: 'list',
