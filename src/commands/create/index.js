@@ -22,7 +22,7 @@ export function createCommand(program) {
     .option('-e, --file-extension <extension>', 'File extension filter', '.ts')
     .action(async (cmd) => {
       //console.log(cmd);
-      const template = parse('template', fs.readFileSync(cmd.template, 'utf-8'));
+      let template = parse('template', fs.readFileSync(cmd.template, 'utf-8'));
       const globalRuntime = template.Globals?.Function?.Runtime;
       const firstFunctionRuntime = Object.values(template.Resources).find(r => r.Type === 'AWS::Serverless::Function')?.Properties?.Runtime;
       const runtime = globalRuntime || firstFunctionRuntime;
@@ -66,8 +66,8 @@ export function createCommand(program) {
         }
       }
 
-      // Add 'AWS::LanguageExtensions' to the second last element in the template.Transforms array
-      template.Transform.splice(template.Transform.length - 1, 0, 'AWS::LanguageExtensions');
+      // Add 'AWS::LanguageExtensions' to the template Transforms property
+      template = updateTemplateProperty(template, 'Transform', 'AWS::LanguageExtensions');
 
       fs.writeFileSync(cmd.template, stringify('template', template));
 
@@ -151,4 +151,21 @@ function listTypesInDirectory(directoryPath, types) {
       });
     }
   }
+}
+
+function updateTemplateProperty(template, property, value) {
+  // If property in the template is missing, make sure we create the property and the value to it
+  if (!template[property]) {
+    template[property] = value;
+  } 
+  // If property in the template is an array
+  else if (Array.isArray(template[property])) {
+    template[property].push(value);
+  }
+  // If property is not an array we should convert it to an array and push the value
+  else if (!Array.isArray(template[property])) {
+    const existingValue = template[property];
+    template[property] = [existingValue, value];
+  }
+  return template;
 }
