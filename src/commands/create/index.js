@@ -67,7 +67,7 @@ export function createCommand(program) {
       }
 
       // Add 'AWS::LanguageExtensions' to the template Transforms property
-      template = updateTemplateProperty(template, 'Transform', 'AWS::LanguageExtensions');
+      template = ensureTemplatePropertyExist(template, 'Transform', 'AWS::LanguageExtensions');
 
       fs.writeFileSync(cmd.template, stringify('template', template));
 
@@ -153,19 +153,26 @@ function listTypesInDirectory(directoryPath, types) {
   }
 }
 
-function updateTemplateProperty(template, property, value) {
+function ensureTemplatePropertyExist(template, property, value) {
   // If property in the template is missing, make sure we create the property and the value to it
   if (!template[property]) {
     template[property] = value;
   } 
   // If property in the template is an array
   else if (Array.isArray(template[property])) {
-    template[property].push(value);
+    // If the value is not already in the array, add it
+    if(!template[property].includes(value)) {
+      template[property].push(value);
+    }
   }
   // If property is not an array we should convert it to an array and push the value
   else if (!Array.isArray(template[property])) {
     const existingValue = template[property];
-    template[property] = [existingValue, value];
+
+    // If the existingValue is not the same as the provided value, add it
+    if(existingValue !== value) {
+      template[property] = [existingValue, value];
+    }
   }
   return template;
 }
