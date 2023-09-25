@@ -57,3 +57,21 @@ Options:
   -h, --help                       display help for command
   
 ```
+
+### `$ schemas create`
+
+```
+Usage: schemas create|c [options]
+
+Browses types in your project and lets you create schemas from them
+
+Options:
+  -t, --template [path]            Path to SAM template (optional)
+  -e, --file-extension [extension] File extension filter (optional)
+  -l, --language [language]        Output language (optional)
+  -p, --profile [profile]          AWS profile to use (default: "default")
+  --path [path]                    Root path
+  --region [region]                The AWS region to use. Falls back on AWS_REGION environment variable if not specified
+  -h, --help                       display help for command
+  
+```
