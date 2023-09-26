@@ -162,8 +162,8 @@ function ensureTemplatePropertyExist(template, property, value) {
   else if (Array.isArray(template[property])) {
     // If the value is not already in the array, add it
     if(!template[property].includes(value)) {
-      // Add the new value to the beginning of the array
-      template[property].unshift(value);
+      // Add the new value second last of the array
+      template[property].splice(template[property].length - 1, 0, value);
     }
   }
   // If property is not an array we should convert it to an array and push the value
