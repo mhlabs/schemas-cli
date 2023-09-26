@@ -162,7 +162,8 @@ function ensureTemplatePropertyExist(template, property, value) {
   else if (Array.isArray(template[property])) {
     // If the value is not already in the array, add it
     if(!template[property].includes(value)) {
-      template[property].push(value);
+      // Add the new value to the beginning of the array
+      template[property].unshift(value);
     }
   }
   // If property is not an array we should convert it to an array and push the value
@@ -171,7 +172,8 @@ function ensureTemplatePropertyExist(template, property, value) {
 
     // If the existingValue is not the same as the provided value, add it
     if(existingValue !== value) {
-      template[property] = [existingValue, value];
+      // Add the new value to the beginning of the array
+      template[property] = [value, existingValue];
     }
   }
   return template;
